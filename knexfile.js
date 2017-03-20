@@ -3,13 +3,27 @@ module.exports = {
     client: 'postgresql',
     connection: {
       database: 'tripwreck_test'
-    }
+    },
+    migrations: {
+      directory: './database/migrations'
+    },
+    seeds: {
+      directory: './database/seeds/'
+    },
+    useNullAsDefault: true
   },
   development: {
     client: 'postgresql',
     connection: {
-      database: 'dev'
-    }
+      database: 'tripwreck_dev'
+    },
+    migrations: {
+      directory: './database/migrations'
+    },
+    seeds: {
+      directory: './database/seeds/'
+    },
+    useNullAsDefault: true
   }
 }
 

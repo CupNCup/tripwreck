@@ -23,13 +23,12 @@ app.use(bodyParser.json());
 // app.use(express.static(path.join(__dirname, '..', 'public')));
 
 //Routers
-// const userRouter = require('./routers/userRouter.js');
+const userRouter = require('./routers/userRouter.js');
 const listRouter = require('./routers/listRouter.js');
 const storeRouter = require('./routers/storeRouter.js');
 
-// app.use('/user', userRouter);
+app.use('/user', userRouter);
 app.use('/list', listRouter);
-// app.use('/lists', listRouter);
 app.use('/store', storeRouter);
 
 //Serve index.html at every other route that comes to server

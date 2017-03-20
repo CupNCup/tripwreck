@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "nodemon server/server.js",
-    "test": "mocha tests/server/"
+    "test": "mocha tests/server/",
+    "testing": "knex seed:run --env test && mocha tests/server/"
   },
   "repository": "git+https://github.com/CupNCup/tripwreck.git",
   "keywords": [
