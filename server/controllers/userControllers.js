@@ -17,7 +17,6 @@ module.exports = {
     var authId = 'caa47ac6-81d1-408a-8090weaasdfsdasd';
     var user = await(Users.make(authId));
 
-    console.log('user', user)
     //if user is null return 404
     if(!user) {
       res.sendStatus(404);

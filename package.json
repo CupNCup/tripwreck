@@ -5,8 +5,14 @@
   "main": "server.js",
   "scripts": {
     "start": "nodemon server/server.js",
-    "test": "mocha tests/server/",
-    "testing": "knex seed:run --env test && mocha tests/server/"
+    "test": "mocha tests/",
+    "createtest": "createdb tripwreck_test",
+    "createdev": "createdb tripwreck_dev",
+    "usemain": "psql postgres",
+    "usetest": "psql tripwreck_test",
+    "usedev": "psql tripwreck_dev",
+    "inittest": "createdb tripwreck_test; knex migrate:latest --env test && knex seed:run --env test",
+    "initdev": "createdb tripwreck_dev; knex migrate:latest && knex seed:run"
   },
   "repository": "git+https://github.com/CupNCup/tripwreck.git",
   "keywords": [

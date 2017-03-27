@@ -18,10 +18,6 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
 
-//Serve static files and node modules
-// app.use('/scripts', express.static(path.join(__dirname, '..', 'mobile/node_modules')))
-// app.use(express.static(path.join(__dirname, '..', 'public')));
-
 //Routers
 const userRouter = require('./routers/userRouter.js');
 const listRouter = require('./routers/listRouter.js');

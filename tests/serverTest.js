@@ -1,10 +1,10 @@
 //Database setup
 process.env.DB_ENV ='test';
-const knex = require('../../database/db');
+const knex = require('../database/db');
 
 //Server setup
 process.env.SERVER_PORT=3000;
-const server = require('../../server/server.js');
+const server = require('../server/server.js');
 const supertest = require('supertest');
 const request = supertest.agent(server);
 
@@ -14,7 +14,7 @@ const expect = chai.expect;
 const chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 
-const addListExample = require('../../database/seeds/examples/addList');
+const addListExample = require('../database/seeds/examples/addList');
 
 describe('User controllers', function () {
   describe('SignUp', function() {
@@ -217,8 +217,7 @@ describe('List controllers', function () {
   describe('Get List', function() {
     it('should get basic info', function (done) {
       request
-        .get('/list')
-        .send({listId: listId})
+        .get(`/list?listId=${listId}`)
         .expect(200)
         .end(function(err, res) {
           if (err) {
@@ -238,8 +237,7 @@ describe('List controllers', function () {
 
     it('should get store info', function (done) {
       request
-        .get('/list')
-        .send({listId: listId})
+        .get(`/list?listId=${listId}`)
         .expect(200)
         .end(function(err, res) {
           if (err) {
@@ -260,8 +258,7 @@ describe('List controllers', function () {
 
     it('should have store type and categories', function (done) {
       request
-        .get('/list')
-        .send({listId: listId})
+        .get(`/list?listId=${listId}`)
         .expect(200)
         .end(function(err, res) {
           if (err) {
@@ -281,8 +278,7 @@ describe('List controllers', function () {
   describe('Get Lists', function() {
     it('should get myLists', function (done) {
       request
-        .get('/list/all')
-        .send({userId: 1})
+        .get('/list/all?userId=1')
         .expect(200)
         .end(function(err, res) {
           if (err) {
@@ -299,8 +295,7 @@ describe('List controllers', function () {
 
     it('should get sharedLists', function (done) {
       request
-        .get('/list/all')
-        .send({userId: 2})
+        .get('/list/all?userId=2')
         .expect(200)
         .end(function(err, res) {
           if (err) {
@@ -383,8 +378,7 @@ describe('List controllers', function () {
   describe('Delete My List', function() {
     it('should delete from lists table', function (done) {
       request
-        .delete('/list')
-        .send({listId: listId})
+        .delete(`/list?listId=${listId}`)
         .expect(200)
         .end(function(err, res) {
           if (err) {
@@ -403,8 +397,7 @@ describe('List controllers', function () {
 
     it('should delete from shared-lists table', function (done) {
       request
-        .delete('/list')
-        .send({listId: listId})
+        .delete(`/list?listId=${listId}`)
         .expect(200)
         .end(function(err, res) {
           if (err) {
@@ -425,11 +418,7 @@ describe('List controllers', function () {
   describe('Delete Shared List', function() {
     it('should delete from shared-lists table', function (done) {
       request
-        .delete('/list/shared')
-        .send({
-          userId: 2,
-          listId: listId
-        })
+        .delete(`/list/shared?userId=2&listId=${listId}`)
         .expect(200)
         .end(function(err, res) {
           if (err) {

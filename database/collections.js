@@ -102,51 +102,58 @@ Collections.Categories.prototype.findOrCreateIds = (categoryArr) => {
         if(ids.length === categoryArr.length) {
           resolve(ids);
         }
-        //Create tempory table with category names
-        knex.raw('CREATE TABLE temp (name varchar(255));')
-          .then((table) => {
-            var categoryNames = `('${categoryArr.join("'),('")}')`;
-            knex.raw(`INSERT INTO temp (name) VALUES ${categoryNames};`)
-              .then(() => {
-                //select category names that doesn't exist in categories table
-                knex.select('name').from('temp')
-                .whereRaw('name NOT IN(SELECT name FROM categories)')
-                .then((names)=> {
-                  //Drop temp table
-                  knex.raw('DROP TABLE temp;')
-                    .then(() => {
-                      //make new categories that doesn't exist
-                      var newCategories = Collections.Categories.forge(names);
-                      newCategories.invokeThen('save')
-                        .then((newCategories) => {
-                          //get ids of newCategories
-                          newCategories.forEach((idObj) => {
-                            ids.push(idObj.id);
-                          })
-                          resolve(ids);
+        //drop temp table if it exist
+        knex.schema.dropTableIfExists('temp')
+          .then(() => {
+            //Create tempory table with category names
+            knex.raw('CREATE TABLE temp (name varchar(255));')
+              .then((table) => {
+                var categoryNames = `('${categoryArr.join("'),('")}')`;
+                knex.raw(`INSERT INTO temp (name) VALUES ${categoryNames};`)
+                  .then(() => {
+                    //select category names that doesn't exist in categories table
+                    knex.select('name').from('temp')
+                    .whereRaw('name NOT IN(SELECT name FROM categories)')
+                    .then((names)=> {
+                      //Drop temp table
+                      knex.schema.dropTableIfExists('temp')
+                        .then(() => {
+                          //make new categories that doesn't exist
+                          var newCategories = Collections.Categories.forge(names);
+                          newCategories.invokeThen('save')
+                            .then((newCategories) => {
+                              //get ids of newCategories
+                              newCategories.forEach((idObj) => {
+                                ids.push(idObj.id);
+                              })
+                              resolve(ids);
+                            })
+                            .catch((err) => {
+                              resolve("cannot create new categories " + err);
+                            })
                         })
                         .catch((err) => {
-                          resolve("cannot create new categories " + err);
+                          resolve("cannot drop temp table " + err);
                         })
                     })
                     .catch((err) => {
-                      resolve("cannot drop temp table " + err);
-                    })
-                })
-                .catch((err) => {
-                  resolve("cannot select names that doesn't exist in categories table" + err);
-                });
+                      resolve("cannot select names that doesn't exist in categories table" + err);
+                    });
+                  })
+                  .catch((err) => {
+                    resolve("cannot insert into temp table " + err);
+                  });
               })
               .catch((err) => {
-                resolve("cannot insert into temp table " + err);
+                resolve("cannot create temp table " + err);
               });
           })
           .catch((err) => {
-            resolve("cannot create temp table " + err);
-          });
+            reject("cannot run dropTableIfExists temp " + err)
+          })
       })
       .catch((err) => {
-        resolve("cannot select from categories " + err);
+        reject("cannot select from categories " + err);
       });
   });
 };
@@ -174,16 +181,16 @@ Collections.Stores.prototype.addNew = async((storeInfo) => {
       type_id: type_id
     }).save()
       .then((store) => {
+        var storeId = store.get('id');
         //attach in knex
           // category_ids = category_ids.map((category_id) => {
           //   return `${store.id},${category_id}`
           // })
           // var query = `insert into stores_categories (store_id, category_id) values (${category_ids.join("),(")});`;
           // knex.raw(query)
-
         store.categories().attach(category_ids)
-          .then((store) => {
-            resolve(store.id);
+          .then(() => {
+            resolve(storeId);
           })
           .catch((err) => {
             reject("cannot attach category_ids to store " + err);
@@ -235,70 +242,91 @@ Collections.Stores.prototype.findOrCreateIds = async((storeArr) => {
           if(ids.length === zomatoIds.length) {
             resolve(ids);
           }
-          //Create tempory table with store zomatoIds
-          knex.raw('CREATE TABLE temp (zomato_id varchar(100));')
-            .then((table) => {
-              var zomato_ids = `('${zomatoIds.join("'),('")}')`;
-              knex.raw(`INSERT INTO temp (zomato_id) VALUES ${zomato_ids};`)
-                .then(() => {
-                  //select store zomato_ids that doesn't exist in stores table
-                  knex.select('zomato_id').from('temp')
-                  .whereRaw('zomato_id NOT IN(SELECT zomato_id FROM stores)')
-                  .then((zomato_ids)=> {
-                    //make new stores that doesn't exist
-                    //change from object to array
-                    zomato_ids = zomato_ids.map((obj) => {
-                      return obj.zomato_id;
-                    });
-
-                    //Drop temp table
-                    knex.schema.dropTable('temp')
-                      .then(() => {
+          //drop temp table if it exist
+          knex.schema.dropTableIfExists('temp')
+            .then(() => {
+              //create tempory table with store zomatoIds
+              knex.raw('CREATE TABLE temp (zomato_id varchar(100));')
+                .then((table) => {
+                  var zomato_ids = `('${zomatoIds.join("'),('")}')`;
+                  knex.raw(`INSERT INTO temp (zomato_id) VALUES ${zomato_ids};`)
+                    .then(() => {
+                      //select store zomato_ids that doesn't exist in stores table
+                      knex.select('zomato_id').from('temp')
+                      .whereRaw('zomato_id NOT IN(SELECT zomato_id FROM stores)')
+                      .then(async((zomato_ids)=> {
+                        //make new stores that doesn't exist
+                        //change from object to array
+                        zomato_ids = zomato_ids.map((obj) => {
+                          return obj.zomato_id;
+                        });
+                        
                         //find stores that needs to be created
-                        var Stores = new Collections.Stores();
                         var storesNeedToBeCreated = storeArr.filter((store) => {
                           return zomato_ids.indexOf(store.zomato_id) !== -1;
                         });
 
-                        //get categories that needs to be created
+                        //get types and categories that needs to be created
+                        var typesNeeded = [];
                         var categoriesNeeded = [];
-                        storesNeedToBeCreated.forEach((stores) => {
-                          stores.categories.forEach((category) => {
+                        storesNeedToBeCreated.forEach((store) => {
+                          var {type, categories} = store;
+                          if(typesNeeded.indexOf(type) === -1) {
+                            typesNeeded.push(type);
+                          }
+
+                          categories.forEach((category) => {
                             if(categoriesNeeded.indexOf(category) === -1) {
                               categoriesNeeded.push(category);
                             }
                           })
                         })
 
+                        //create all of types needed
+                        var Types = new Collections.Types();
+                        if(typesNeeded.length > 1) {
+                          console.log("err cannot make more than one type yet");
+                        }
+                        await(Types.findOrCreateId(typesNeeded[0]));
+
                         //create all of categories needed
                         var Categories = new Collections.Categories();
                         await(Categories.findOrCreateIds(categoriesNeeded));
-
+        
                         //create new stores
+                        var Stores = new Collections.Stores();
                         storesNeedToBeCreated.forEach(async((store) => {
-                            ids.push(await(Stores.addNew(store)));
+                          var id = await(Stores.addNew(store));
+                          ids.push(id);
                         }));
 
-                        resolve(ids);
-                      })
+                        //Drop temp table
+                        knex.schema.dropTableIfExists('temp')
+                          .then(() => {
+                            resolve(ids);
+                          })
+                          .catch((err) => {
+                            resolve("cannot drop temp table " + err);
+                          });
+                      }))
                       .catch((err) => {
-                        resolve("cannot drop temp table " + err);
+                        resolve("cannot select zomato_ids that doesn't exist in stores table" + err);
                       });
-                  })
-                  .catch((err) => {
-                    resolve("cannot select zomato_ids that doesn't exist in stores table" + err);
-                  });
+                    })
+                    .catch((err) => {
+                      resolve("cannot insert into temp table " + err);
+                    });
                 })
                 .catch((err) => {
-                  resolve("cannot insert into temp table " + err);
+                  resolve("cannot create temp table " + err);
                 });
             })
-            .catch((err) => {
-              resolve("cannot create temp table " + err);
-            });
+            .catch(() => {
+              reject ("cannot run dropTableIfExists temp " + err)
+            })
         })
         .catch((err) => {
-          resolve("cannot select from stores " + err);
+          reject("cannot select from stores " + err);
         });
     });
 });
@@ -309,7 +337,7 @@ Collections.Lists.prototype.make = (data) => {
     //find storeIds
     var Stores = new Collections.Stores();
     var storeIds = await(Stores.findOrCreateIds(data.list));
-    
+
     //make new list
     new Models.List({
       title: data.title,
@@ -327,7 +355,6 @@ Collections.Lists.prototype.make = (data) => {
           // })
           // var query = `insert into lists_stores (list_id, store_id) values (${storeIds.join("),(")});`;
           // Models.Bookshelf.knex.raw(query)
-
         list.stores().attach(storeIds)
           .then(() => {
             resolve(list.id);

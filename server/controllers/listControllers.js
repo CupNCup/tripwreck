@@ -18,20 +18,19 @@ module.exports = {
 
   //add sharedList
   addSharedList: async((req, res) => {
-    var userId = req.body.userId;
-    var listId = req.body.listId;
+    var { userId, listId } = req.body;
     await(Lists.addSharedList(userId, listId));
     res.sendStatus(201);
   }),
 
   //get detailed informations on stores in a list
   getList: async((req, res) => {
-    var listId = req.body.listId;
+    var { listId } = req.query;
     var list = await(Lists.getInfo(listId));
 
     //make type_name and category_names property
     list = JSON.parse(JSON.stringify(list));
-    var stores = list.stores;
+    var { stores } = list;
     stores.forEach((store) => {
       store.type = store.type.name;
       var categories = store.categories;
@@ -45,7 +44,7 @@ module.exports = {
 
   //get all lists associated with a user
   getLists: async((req, res) => {
-    var userId = req.body.userId;
+    var { userId } = req.query;
     var myLists = await(Lists.getMyLists(userId));
     var sharedLists = await(Lists.getSharedLists(userId));
     
@@ -67,15 +66,14 @@ module.exports = {
 
   //delete myList (list I created)
   deleteMyList: async((req, res) => {
-    var listId = req.body.listId;
+    var { listId } = req.query;
     await(Lists.deleteMyList(listId));
     res.sendStatus(200);
   }),
 
   //delete a sharedList (list someone shared with me)
   deleteSharedList: async((req, res) => {
-    var userId = req.body.userId;
-    var listId = req.body.listId;
+    var { userId, listId } = req.query;
     await(Lists.deleteSharedList(userId, listId));
     res.sendStatus(200);
   })
