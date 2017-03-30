@@ -1,11 +1,13 @@
 import {
   SEARCH_INPUT_CHANGE,
-  SEARCH_RESTAURANT
+  SEARCH_RESTAURANT,
+  SELECTED_RESTAURANT
 } from '../actions/types';
 
 const INITIAL_STATE = {
   searchInput: '',
-  searchResults: []
+  searchResults: [],
+  selectedRestaurant: {}
 }
 
 export default (state = INITIAL_STATE, action) => {
@@ -16,6 +18,8 @@ export default (state = INITIAL_STATE, action) => {
       return { ...state, searchInput: action.payload };
     case SEARCH_RESTAURANT:
       return { ...state, searchResults: action.payload.data };
+    case SELECTED_RESTAURANT:
+      return { ...state, selectedRestaurant: action.payload };
     default:
       return state;
   }
