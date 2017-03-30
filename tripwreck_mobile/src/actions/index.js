@@ -5,11 +5,13 @@ import { store } from '../reducers';
 import {
   SEARCH_INPUT_CHANGE,
   SEARCH_RESTAURANT,
+  SELECTED_RESTAURANT,
   EMAIL_CHANGED,
   PASSWORD_CHANGED,
   LOGIN_USER_SUCCESS,
   LOGIN_USER_FAIL,
-  LOGIN_USER_START
+  LOGIN_USER_START,
+  ADD_TO_ACTIVE_LIST
 } from './types';
 
 
@@ -26,7 +28,22 @@ export const searchRestaurant = (restaurant) => {
   return {
     type: SEARCH_RESTAURANT,
     payload: request
-  }
+  };
+};
+
+export const setSelectedRestaurant = (restaurant) => {
+  Actions.DetailPage();
+  return {
+    type: SELECTED_RESTAURANT,
+    payload: restaurant
+  };
+};
+
+export const addToActiveList = (restaurant) => {
+  return {
+    type: ADD_TO_ACTIVE_LIST,
+    payload: restaurant
+  };
 };
 
 export const emailChanged = (text) => {

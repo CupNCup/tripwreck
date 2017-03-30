@@ -10,7 +10,7 @@ import Router from './Router';
 
 class App extends Component {
 
-  componentWillMount() {
+  componentDidMount() {
     const config = {
       apiKey: "AIzaSyCg1PA-dy03iR4kAizhQxNjKe71NLYMl2E",
       authDomain: "tripwreck-df257.firebaseapp.com",
