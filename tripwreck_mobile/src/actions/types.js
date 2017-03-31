@@ -7,3 +7,4 @@ export const LOGIN_USER_FAIL = 'login_user_fail';
 export const LOGIN_USER_START = 'LOGIN_USER_START';
 export const SELECTED_RESTAURANT = 'SELECTED_RESTAURANT';
 export const ADD_TO_ACTIVE_LIST = 'ADD_TO_ACTIVE_LIST';
+export const CLEAR_ACTIVE_LIST = 'CLEAR_ACTIVE_LIST';

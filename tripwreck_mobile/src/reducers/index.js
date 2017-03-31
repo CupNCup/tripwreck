@@ -6,5 +6,5 @@ import ListReducer from './ListReducer';
 export default combineReducers({
   auth: AuthReducer,
   searchInput: SearchBarReducer,
-  list: ListReducer
+  activeList: ListReducer
 });

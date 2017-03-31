@@ -4,31 +4,6 @@ import { connect } from 'react-redux';
 import { Card, CardSection } from '../common';
 import { setSelectedRestaurant } from '../../actions';
 
-const styles = {
-  headerContentStyle: {
-    flexDirection: 'column',
-    justifyContent: 'space-around',
-  },
-  headerTextStyle: {
-    fontSize: 18
-  },
-  thumbnailStyle: {
-    height: 50,
-    width: 50,
-  },
-  thumbnailContainerStyle: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 10,
-    marginRight: 10,
-  },
-  imageStyle: {
-    height: 300,
-    flex: 1,
-    width: null,
-  }
-};
-
 class SearchResults extends Component {
 
   onResultPress(item) {
@@ -69,6 +44,31 @@ class SearchResults extends Component {
     )
   }
 }
+
+const styles = {
+  headerContentStyle: {
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+  },
+  headerTextStyle: {
+    fontSize: 18
+  },
+  thumbnailStyle: {
+    height: 50,
+    width: 50,
+  },
+  thumbnailContainerStyle: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  imageStyle: {
+    height: 300,
+    flex: 1,
+    width: null,
+  }
+};
 
 const mapStateToProps = (state) => {
   return { searchResults: state.searchInput.searchResults };
