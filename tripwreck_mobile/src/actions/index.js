@@ -11,7 +11,8 @@ import {
   LOGIN_USER_SUCCESS,
   LOGIN_USER_FAIL,
   LOGIN_USER_START,
-  ADD_TO_ACTIVE_LIST
+  ADD_TO_ACTIVE_LIST,
+  CLEAR_ACTIVE_LIST
 } from './types';
 
 
@@ -45,6 +46,13 @@ export const addToActiveList = (restaurant) => {
     payload: restaurant
   };
 };
+
+export const clearActiveList = () => {
+  return {
+    type: CLEAR_ACTIVE_LIST,
+    payload: []
+  }
+}
 
 export const emailChanged = (text) => {
   return  {

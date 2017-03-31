@@ -3,6 +3,7 @@ import { Scene, Router, Actions } from 'react-native-router-flux';
 import SearchPage from './components/Search_Components/SearchPage';
 import LoginForm from './components/Login_Components/LoginForm';
 import DetailPage from './components/Details_Components/DetailPage';
+import ActiveList from './components/Active_List_Components/ActiveList';
 
 const RouterComponent = () => {
   return (
@@ -13,6 +14,7 @@ const RouterComponent = () => {
       <Scene key="main">
         <Scene key="SearchPage" component={SearchPage} title="Search" />
         <Scene key="DetailPage" component={DetailPage} title="Detail" />
+        <Scene key="ActiveList" component={ActiveList} title="Active List" />
       </Scene>
     </Router>
   )

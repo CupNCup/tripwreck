@@ -9,6 +9,7 @@ class DetailPage extends Component {
   render() {
     const { address, name, price, rating, thumb, categories, location } = this.props.selectedRestaurant;
     const { thumbnailStyle } = styles;
+    const lastItemInCategories = categories.slice(-1)[0];
 
     return (
       <Card>
@@ -29,7 +30,13 @@ class DetailPage extends Component {
         </CardSection>
 
         <CardSection>
-          <Text>Categories: { categories.map(category => (<Text key={category}>{category}</Text>)) }</Text>
+          <Text>Categories: { categories.map(category => {
+              if(category === lastItemInCategories) {
+                return (
+                  <Text key={category}>{category}</Text>
+                )
+              }
+              return (<Text key={category}>{(category + ',')}</Text>)}) }</Text>
         </CardSection>
       </Card>
     )

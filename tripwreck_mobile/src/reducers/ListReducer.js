@@ -1,5 +1,6 @@
 import {
-  ADD_TO_ACTIVE_LIST
+  ADD_TO_ACTIVE_LIST,
+  CLEAR_ACTIVE_LIST
 } from '../actions/types';
 
 const INITIAL_STATE = {
@@ -12,6 +13,8 @@ export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case ADD_TO_ACTIVE_LIST:
       return [ ...state, action.payload ];
+    case CLEAR_ACTIVE_LIST:
+      return action.payload;
     default:
       return state;
   }
